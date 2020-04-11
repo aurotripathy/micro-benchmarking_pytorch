@@ -151,7 +151,8 @@ def run_benchmarking(local_rank, ngpus, net, batch_size, iterations, run_fp16, d
     if (net == "inception_v3"):
         image_height = image_width = 299
     else:
-        image_height = image_width = 224
+        image_height = args.image_height
+        image_width = args.image_width
     cpu_inp = torch.randn(batch_size, 3, image_height, image_width, device="cpu")
     inp = cpu_inp.to(device="cuda")
     if (run_fp16):
@@ -233,6 +234,8 @@ if __name__ == '__main__':
     parser.add_argument("--network", type=str, 
         choices=['alexnet', 'vgg11', 'vgg13', 'vgg16', 'vgg19', 'vgg11_bn', 'vgg13_bn', 'vgg16_bn', 'vgg19_bn', 'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'shufflenet', 'shufflenet_v2_x05', 'shufflenet_v2_x10', 'shufflenet_v2_x15', 'SqueezeNet', 'SqueezeNet1.1', 'densenet121', 'densenet169', 'densenet201', 'densenet161', 'inception', 'inception_v3', 'resnext50', 'resnext101', 'mobilenet_v2', 'googlenet' , 'deeplabv3_resnet50', 'deeplabv3_resnet101', 'fcn_resnet50', 'fcn_resnet101' ],
         required=True, help="Network to run.")
+    parser.add_argument("--image-height", type=int, required=False, default=224, help="Height of image, all images have the same height")
+    parser.add_argument("--image-width", type=int, required=False, default=224, help="Width of image, all images have the same width")
     parser.add_argument("--batch-size" , type=int, required=False, default=64, help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--iterations", type=int, required=False, default=20, help="Iterations")
     parser.add_argument("--fp16", type=int, required=False, default=0,help="FP16 mixed precision benchmarking")
