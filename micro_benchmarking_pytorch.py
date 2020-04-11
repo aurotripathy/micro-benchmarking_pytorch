@@ -149,9 +149,11 @@ def run_benchmarking(local_rank, ngpus, net, batch_size, iterations, run_fp16, d
         batch_size = int(batch_size / ngpus)
 
     if (net == "inception_v3"):
-        inp = torch.randn(batch_size, 3, 299, 299, device="cuda")
+        image_height = image_width = 299
     else:
-        inp = torch.randn(batch_size, 3, 224, 224, device="cuda")
+        image_height = image_width = 224
+    cpu_inp = torch.randn(batch_size, 3, image_height, image_width, device="cpu")
+    inp = cpu_inp.to(device="cuda")
     if (run_fp16):
         inp = inp.half()
     target = torch.arange(batch_size, device="cuda")
@@ -172,6 +174,8 @@ def run_benchmarking(local_rank, ngpus, net, batch_size, iterations, run_fp16, d
     print ("INFO: running the benchmark..")
     tm = time.time()
     for i in range(iterations):
+        cpu_inp = torch.randn(batch_size, 3, image_height, image_width, device="cpu")
+        inp = cpu_inp.to(device="cuda")
         forwardbackward(inp, optimizer, network, target)
     torch.cuda.synchronize()
     
